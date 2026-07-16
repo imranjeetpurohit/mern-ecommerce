@@ -120,9 +120,7 @@ function ProductCard({ product }) {
 
                     <img
 
-                    src={
-                    `http://localhost:8000${product.image}`
-                    }
+                    src={`https://mern-ecommerce-rhhf.onrender.com${product.image}`}
 
                     alt={product.name}
 

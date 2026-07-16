@@ -1,132 +1,48 @@
-import {
-    useEffect,
-    useState
-} from "react";
+import { useEffect, useState } from "react";
 
+import { getWishlist, removeWishlist } from "../services/wishlistService";
 
-import {
-    getWishlist,
-    removeWishlist
-} from "../services/wishlistService";
-
-
-import {
-    FaHeart,
-    FaTrash,
-    FaShoppingBag
-} from "react-icons/fa";
-
+import { FaHeart, FaTrash, FaShoppingBag } from "react-icons/fa";
 
 import { Link } from "react-router-dom";
 
-
-
-function Wishlist(){
-
-
-const [items,setItems]=useState([]);
-
-const [loading,setLoading]=useState(true);
-
-
-
-
-
-
-
-useEffect(()=>{
-
-
-loadWishlist();
-
-
-},[]);
-
-
-
-
-
-
-
-const loadWishlist=async()=>{
-
-
-try{
-
-
-setLoading(true);
-
-
-const data = await getWishlist();
-
-
-setItems(data);
-
-
-}
-catch(error){
-
-
-console.log(error);
-
-
-}
-finally{
-
-
-setLoading(false);
-
-
-}
-
-
-};
-
-
-
-
-
-
-
-
-const removeItem=async(id)=>{
-
-
-try{
-
-
-await removeWishlist(id);
-
-
-loadWishlist();
-
-
-}
-catch(error){
-
-
-console.log(error);
-
-
-}
-
-
-};
-
-
-
-
-
-
-
-
-
-if(loading){
-
-
-return (
-
-<div className="
+function Wishlist() {
+  const [items, setItems] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadWishlist();
+  }, []);
+
+  const loadWishlist = async () => {
+    try {
+      setLoading(true);
+
+      const data = await getWishlist();
+
+      setItems(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeItem = async (id) => {
+    try {
+      await removeWishlist(id);
+
+      loadWishlist();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div
+        className="
 
 min-h-screen
 
@@ -142,30 +58,16 @@ font-bold
 
 text-gray-600
 
-">
+"
+      >
+        Loading Wishlist...
+      </div>
+    );
+  }
 
-Loading Wishlist...
-
-</div>
-
-);
-
-
-}
-
-
-
-
-
-
-
-
-
-return (
-
-
-
-<div className="
+  return (
+    <div
+      className="
 
 min-h-screen
 
@@ -173,42 +75,30 @@ py-10
 
 px-5
 
-">
-
-
-
-
-
-
-
-
-<div className="
+"
+    >
+      <div
+        className="
 
 max-w-7xl
 
 mx-auto
 
-">
+"
+      >
+        {/* Header */}
 
-
-
-
-
-{/* Header */}
-
-
-
-<div className="
+        <div
+          className="
 
 text-center
 
 mb-10
 
-">
-
-
-
-<div className="
+"
+        >
+          <div
+            className="
 
 flex
 
@@ -216,10 +106,10 @@ justify-center
 
 mb-4
 
-">
-
-
-<div className="
+"
+          >
+            <div
+              className="
 
 w-20
 
@@ -235,33 +125,22 @@ items-center
 
 justify-center
 
-">
-
-
-<FaHeart
-
-className="
+"
+            >
+              <FaHeart
+                className="
 
 text-red-500
 
 text-4xl
 
 "
+              />
+            </div>
+          </div>
 
-/>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-<h1 className="
+          <h1
+            className="
 
 text-4xl
 
@@ -269,48 +148,27 @@ font-extrabold
 
 text-gray-800
 
-">
+"
+          >
+            My Wishlist
+          </h1>
 
-My Wishlist
-
-</h1>
-
-
-
-<p className="
+          <p
+            className="
 
 text-gray-600
 
 mt-3
 
-">
+"
+          >
+            Your favourite products saved in one place
+          </p>
+        </div>
 
-Your favourite products saved in one place
-
-</p>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-{
-
-items.length===0
-
-?
-
-(
-
-
-<div className="
+        {items.length === 0 ? (
+          <div
+            className="
 
 max-w-md
 
@@ -326,13 +184,10 @@ p-10
 
 text-center
 
-">
-
-
-
-
-
-<div className="
+"
+          >
+            <div
+              className="
 
 flex
 
@@ -340,29 +195,21 @@ justify-center
 
 mb-5
 
-">
-
-
-<FaShoppingBag
-
-className="
+"
+            >
+              <FaShoppingBag
+                className="
 
 text-6xl
 
 text-gray-300
 
 "
+              />
+            </div>
 
-/>
-
-
-</div>
-
-
-
-
-
-<h2 className="
+            <h2
+              className="
 
 text-2xl
 
@@ -370,33 +217,26 @@ font-bold
 
 text-gray-700
 
-">
+"
+            >
+              Wishlist Empty
+            </h2>
 
-Wishlist Empty
-
-</h2>
-
-
-
-<p className="
+            <p
+              className="
 
 text-gray-500
 
 mt-3
 
-">
+"
+            >
+              Add products you love and they will appear here
+            </p>
 
-Add products you love and they will appear here
-
-</p>
-
-
-
-<Link
-
-to="/"
-
-className="
+            <Link
+              to="/"
+              className="
 
 inline-block
 
@@ -419,29 +259,13 @@ hover:bg-indigo-700
 transition
 
 "
-
->
-
-Explore Products
-
-</Link>
-
-
-
-
-</div>
-
-
-)
-
-
-:
-
-
-(
-
-
-<div className="
+            >
+              Explore Products
+            </Link>
+          </div>
+        ) : (
+          <div
+            className="
 
 grid
 
@@ -455,21 +279,12 @@ lg:grid-cols-4
 
 gap-8
 
-">
-
-
-
-{
-
-items.map(item=>(
-
-
-
-<div
-
-key={item._id}
-
-className="
+"
+          >
+            {items.map((item) => (
+              <div
+                key={item._id}
+                className="
 
 bg-white
 
@@ -488,22 +303,11 @@ transition
 duration-300
 
 "
-
->
-
-
-
-
-
-
-
-<img
-
-src={`http://localhost:8000${item.image}`}
-
-alt={item.name}
-
-className="
+              >
+                <img
+                  src={`https://mern-ecommerce-rhhf.onrender.com${product.image}`}
+                  alt={item.name}
+                  className="
 
 w-full
 
@@ -514,16 +318,10 @@ object-cover
 rounded-2xl
 
 "
+                />
 
-/>
-
-
-
-
-
-
-
-<h3 className="
+                <h3
+                  className="
 
 text-xl
 
@@ -533,18 +331,13 @@ mt-5
 
 text-gray-800
 
-">
+"
+                >
+                  {item.name}
+                </h3>
 
-{item.name}
-
-</h3>
-
-
-
-
-
-
-<p className="
+                <p
+                  className="
 
 text-indigo-600
 
@@ -554,24 +347,14 @@ text-lg
 
 mt-2
 
-">
+"
+                >
+                  ₹ {item.price}
+                </p>
 
-₹ {item.price}
-
-</p>
-
-
-
-
-
-
-
-
-<button
-
-onClick={()=>removeItem(item._id)}
-
-className="
+                <button
+                  onClick={() => removeItem(item._id)}
+                  className="
 
 mt-5
 
@@ -600,58 +383,17 @@ hover:bg-red-600
 transition
 
 "
-
->
-
-
-<FaTrash/>
-
-Remove
-
-
-</button>
-
-
-
-
-
-
-</div>
-
-
-
-))
-
-
+                >
+                  <FaTrash />
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
-
-
-
-</div>
-
-
-)
-
-
-}
-
-
-
-</div>
-
-
-
-
-
-
-
-</div>
-
-
-);
-
-
-}
-
 
 export default Wishlist;

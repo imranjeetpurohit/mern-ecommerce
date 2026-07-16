@@ -210,9 +210,7 @@ gap-6
 
 <img
 
-src={
-`http://localhost:8000${item.image}`
-}
+src={`https://mern-ecommerce-rhhf.onrender.com${product.image}`}
 
 alt={item.name}
 

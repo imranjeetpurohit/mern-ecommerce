@@ -1065,7 +1065,7 @@ transition
 
 <img
 
-src={`http://localhost:8000${product.image}`}
+src={`https://mern-ecommerce-rhhf.onrender.com${product.image}`}
 
 className="
 
