@@ -305,7 +305,7 @@ duration-300
 "
               >
                 <img
-                  src={`https://mern-ecommerce-rhhf.onrender.com${product.image}`}
+                  src={`https://mern-ecommerce-rhhf.onrender.com${item.image}`}
                   alt={item.name}
                   className="
 
