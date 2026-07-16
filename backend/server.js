@@ -9,8 +9,7 @@ const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
-const wishlistRoutes =
-require("./routes/wishlistRoutes");
+const wishlistRoutes = require("./routes/wishlistRoutes");
 
 dotenv.config();
 
@@ -23,7 +22,16 @@ const app = express();
 
 
 // Middleware
-app.use(cors());
+app.use(
+    cors({
+        origin: [
+            "http://localhost:5173",
+            "https://your-vercel-app.vercel.app"
+        ],
+        credentials: true
+    })
+);
+
 
 app.use(express.json());
 
@@ -42,24 +50,20 @@ app.use(
     authRoutes
 );
 
-
 app.use(
     "/api/users",
     userRoutes
 );
-
 
 app.use(
     "/api/products",
     productRoutes
 );
 
-
 app.use(
     "/api/orders",
     orderRoutes
 );
-
 
 app.use(
     "/api/reviews",
@@ -67,9 +71,10 @@ app.use(
 );
 
 app.use(
-"/api/wishlist",
-wishlistRoutes
+    "/api/wishlist",
+    wishlistRoutes
 );
+
 
 // Test Route
 
