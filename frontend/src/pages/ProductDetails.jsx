@@ -1,301 +1,198 @@
 import { useEffect, useState, useContext } from "react";
-import { useParams } from "react-router-dom";
 
-import {
-    getProductById
-} from "../services/productService";
+import { useParams, useNavigate } from "react-router-dom";
 
-import {
-    createReview
-} from "../services/reviewService";
+import { getProductById } from "../services/productService";
 
-import {
-    CartContext
-} from "../context/CartContext";
+import { createReview } from "../services/reviewService";
 
-import {
-    AuthContext
-} from "../context/AuthContext";
+import { CartContext } from "../context/CartContext";
 
-import {
-    FaShoppingCart,
-    FaStar
-} from "react-icons/fa";
+import { AuthContext } from "../context/AuthContext";
 
-
+import { FaShoppingCart, FaStar } from "react-icons/fa";
 
 function ProductDetails() {
+  const { id } = useParams();
 
+  const navigate = useNavigate();
 
-    const { id } = useParams();
+  const { addToCart } = useContext(CartContext);
 
+  const { user } = useContext(AuthContext);
 
-    const {
-        addToCart
-    } = useContext(CartContext);
+  const [product, setProduct] = useState(null);
 
+  const [rating, setRating] = useState(5);
 
+  const [comment, setComment] = useState("");
 
-    const {
-        user
-    } = useContext(AuthContext);
+  useEffect(() => {
+    loadProduct();
+  }, []);
 
+  const loadProduct = async () => {
+    try {
+      const data = await getProductById(id);
 
+      setProduct(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  const handleAddToCart = () => {
+    if (!user) {
+      navigate("/login");
 
-    const [product,setProduct] = useState(null);
-
-
-
-    const [rating,setRating] = useState(5);
-
-
-    const [comment,setComment] = useState("");
-
-
-
-
-
-    useEffect(()=>{
-
-
-        loadProduct();
-
-
-    },[]);
-
-
-
-
-
-
-    const loadProduct = async()=>{
-
-
-        const data = await getProductById(id);
-
-
-        setProduct(data);
-
-
-    };
-
-
-
-
-
-
-   const submitReview = async()=>{
-
-
-    if(!comment.trim()){
-
-        alert("Please write a review first");
-
-        return;
-
+      return;
     }
 
+    addToCart(product);
+  };
 
-    try{
+  const submitReview = async () => {
+    if (!user) {
+      navigate("/login");
 
-
-        await createReview(
-
-            id,
-
-            {
-                rating:Number(rating),
-                comment:comment.trim()
-            }
-
-        );
-
-
-        setComment("");
-
-        setRating(5);
-
-
-        loadProduct();
-
-
-    }
-    catch(error){
-
-        console.log(
-            error.response?.data || error
-        );
-
-        alert(
-            error.response?.data?.message ||
-            "Failed to submit review"
-        );
-
+      return;
     }
 
+    if (!comment.trim()) {
+      alert("Please write a review first");
 
-};
+      return;
+    }
 
+    try {
+      await createReview(
+        id,
 
+        {
+          rating: Number(rating),
 
+          comment: comment.trim(),
+        },
+      );
 
+      setComment("");
 
+      setRating(5);
 
+      loadProduct();
+    } catch (error) {
+      console.log(error.response?.data || error);
 
-    if(!product){
+      alert(error.response?.data?.message || "Failed to submit review");
+    }
+  };
 
-
-        return (
-
-            <h1 className="
+  if (!product) {
+    return (
+      <h1
+        className="
             text-center
             text-2xl
             mt-10
-            ">
+            "
+      >
+        Loading...
+      </h1>
+    );
+  }
 
-            Loading...
-
-            </h1>
-
-        );
-
-    }
-
-
-
-
-
-
-    return (
-
-
-    <div className="
+  return (
+    <div
+      className="
     max-w-6xl
     mx-auto
     bg-white
     rounded-2xl
     shadow-lg
     p-8
-    ">
+    "
+    >
+      {/* Product Section */}
 
-
-
-
-
-        {/* Product Section */}
-
-
-
-        <div className="
+      <div
+        className="
         grid
         md:grid-cols-2
         gap-10
-        ">
-
-
-
-            <img
-
-            src={`https://mern-ecommerce-rhhf.onrender.com${product.image}`}
-            alt={product.name}
-
-            className="
+        "
+      >
+        <img
+          src={
+            product.image?.startsWith("http")
+              ? product.image
+              : `https://mern-ecommerce-rhhf.onrender.com${product.image}`
+          }
+          alt={product.name}
+          className="
             w-full
             h-96
             object-cover
             rounded-2xl
             "
+        />
 
-            />
-
-
-
-
-
-            <div>
-
-
-
-                <h1 className="
+        <div>
+          <h1
+            className="
                 text-4xl
                 font-bold
                 text-gray-800
-                ">
+                "
+          >
+            {product.name}
+          </h1>
 
-                    {product.name}
-
-                </h1>
-
-
-
-
-                <p className="
+          <p
+            className="
                 text-gray-600
                 mt-5
                 leading-7
-                ">
+                "
+          >
+            {product.description}
+          </p>
 
-                    {product.description}
-
-                </p>
-
-
-
-
-                <h2 className="
+          <h2
+            className="
                 text-3xl
                 font-bold
                 text-blue-600
                 mt-5
-                ">
+                "
+          >
+            ₹ {product.price}
+          </h2>
 
-                    ₹ {product.price}
-
-                </h2>
-
-
-
-
-
-
-                <div className="
+          <div
+            className="
                 flex
                 items-center
                 gap-2
                 mt-4
                 text-yellow-500
-                ">
+                "
+          >
+            <FaStar />
 
+            {product.rating}
 
-                    <FaStar/>
-
-                    {product.rating}
-
-                    <span className="
+            <span
+              className="
                     text-gray-500
-                    ">
+                    "
+            >
+              ({product.numReviews} reviews)
+            </span>
+          </div>
 
-                    ({product.numReviews} reviews)
-
-                    </span>
-
-
-                </div>
-
-
-
-
-
-
-
-                <button
-
-                onClick={()=>
-                    addToCart(product)
-                }
-
-                className="
+          <button
+            onClick={handleAddToCart}
+            className="
                 mt-6
                 bg-blue-600
                 text-white
@@ -309,234 +206,125 @@ function ProductDetails() {
                 hover:bg-blue-700
                 transition
                 "
-
-                >
-
-                <FaShoppingCart/>
-
-                Add To Cart
-
-
-                </button>
-
-
-
-
-            </div>
-
-
-
+          >
+            <FaShoppingCart />
+            Add To Cart
+          </button>
         </div>
+      </div>
 
+      {/* Reviews */}
 
-
-
-
-
-
-        {/* Reviews */}
-
-
-
-
-        <div className="
+      <div
+        className="
         mt-12
-        ">
-
-
-            <h2 className="
+        "
+      >
+        <h2
+          className="
             text-2xl
             font-bold
             mb-5
-            ">
+            "
+        >
+          Customer Reviews
+        </h2>
 
-            Customer Reviews
-
-            </h2>
-
-
-
-
-
-            {
-
-            product.reviews.length===0
-
-            ?
-
-            (
-
-                <p className="
+        {product.reviews.length === 0 ? (
+          <p
+            className="
                 text-gray-500
-                ">
-
-                No reviews yet
-
-                </p>
-
-            )
-
-
-            :
-
-            (
-
-            product.reviews.map(review=>(
-
-
-                <div
-
-                key={review._id}
-
-                className="
+                "
+          >
+            No reviews yet
+          </p>
+        ) : (
+          product.reviews.map((review) => (
+            <div
+              key={review._id}
+              className="
                 border
                 rounded-xl
                 p-5
                 mb-4
                 bg-gray-50
                 "
-
-                >
-
-
-                    <h4 className="
+            >
+              <h4
+                className="
                     font-bold
-                    ">
+                    "
+              >
+                {review.name}
+              </h4>
 
-                    {review.name}
-
-                    </h4>
-
-
-
-                    <p className="
+              <p
+                className="
                     text-yellow-500
                     mt-2
-                    ">
+                    "
+              >
+                ⭐ {review.rating}
+              </p>
 
-                    ⭐ {review.rating}
-
-                    </p>
-
-
-
-                    <p className="
+              <p
+                className="
                     mt-2
                     text-gray-700
-                    ">
+                    "
+              >
+                {review.comment}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
 
-                    {review.comment}
+      {/* Add Review */}
 
-                    </p>
-
-
-
-                </div>
-
-
-            ))
-
-            )
-
-            }
-
-
-
-        </div>
-
-
-
-
-
-
-
-        {/* Add Review */}
-
-
-
-        {
-
-        user &&
-
-        <div className="
+      {user && (
+        <div
+          className="
         mt-10
         border-t
         pt-8
-        ">
-
-
-            <h2 className="
+        "
+        >
+          <h2
+            className="
             text-2xl
             font-bold
             mb-5
-            ">
-
+            "
+          >
             Write Review
+          </h2>
 
-            </h2>
-
-
-
-
-            <select
-
+          <select
             value={rating}
-
-            onChange={
-            e=>setRating(Number(e.target.value))
-            }
-
+            onChange={(e) => setRating(Number(e.target.value))}
             className="
             border
             rounded-lg
             px-4
             py-2
             "
+          >
+            <option value="1">1 ⭐</option>
 
-            >
+            <option value="2">2 ⭐</option>
 
-                <option value="1">
-                1 ⭐
-                </option>
+            <option value="3">3 ⭐</option>
 
+            <option value="4">4 ⭐</option>
 
-                <option value="2">
-                2 ⭐
-                </option>
+            <option value="5">5 ⭐</option>
+          </select>
 
-
-                <option value="3">
-                3 ⭐
-                </option>
-
-
-                <option value="4">
-                4 ⭐
-                </option>
-
-
-                <option value="5">
-                5 ⭐
-                </option>
-
-
-            </select>
-
-
-
-
-
-
-            <textarea
-
+          <textarea
             placeholder="Write your review..."
-
             value={comment}
-
-            onChange={
-            e=>setComment(e.target.value)
-            }
-
+            onChange={(e) => setComment(e.target.value)}
             className="
             w-full
             border
@@ -545,19 +333,10 @@ function ProductDetails() {
             mt-4
             h-32
             "
+          />
 
-            />
-
-
-
-
-
-
-
-            <button
-
+          <button
             onClick={submitReview}
-
             className="
             mt-4
             bg-green-600
@@ -568,29 +347,13 @@ function ProductDetails() {
             hover:bg-green-700
             transition
             "
-
-            >
-
+          >
             Submit Review
-
-            </button>
-
-
-
+          </button>
         </div>
-
-        }
-
-
-
-
+      )}
     </div>
-
-
-    );
-
-
+  );
 }
-
 
 export default ProductDetails;

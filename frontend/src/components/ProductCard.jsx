@@ -1,100 +1,60 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 
 import { CartContext } from "../context/CartContext";
+import { AuthContext } from "../context/AuthContext";
 
-import {
-    addWishlist,
-    removeWishlist
-} from "../services/wishlistService";
+import { addWishlist, removeWishlist } from "../services/wishlistService";
 
-import {
-    FaHeart,
-    FaShoppingCart
-} from "react-icons/fa";
-
-
+import { FaHeart, FaShoppingCart } from "react-icons/fa";
 
 function ProductCard({ product }) {
+  const navigate = useNavigate();
 
+  const { user } = useContext(AuthContext);
 
-    const {
+  const { cartItems, addToCart, increaseQuantity, decreaseQuantity } =
+    useContext(CartContext);
 
-        cartItems,
-        addToCart,
-        increaseQuantity,
-        decreaseQuantity
+  const [liked, setLiked] = useState(false);
 
-    } = useContext(CartContext);
+  const cartProduct = cartItems.find((item) => item._id === product._id);
 
+  const handleAddToCart = () => {
+    if (!user) {
+      navigate("/login");
 
+      return;
+    }
 
-    const [liked, setLiked] = useState(false);
+    addToCart(product);
+  };
 
+  const handleWishlist = async () => {
+    if (!user) {
+      navigate("/login");
 
+      return;
+    }
 
+    try {
+      if (liked) {
+        await removeWishlist(product._id);
 
-    const cartProduct = cartItems.find(
+        setLiked(false);
+      } else {
+        await addWishlist(product._id);
 
-        item => item._id === product._id
+        setLiked(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    );
-
-
-
-
-
-
-
-    const handleWishlist = async () => {
-
-
-        try {
-
-
-            if (liked) {
-
-
-                await removeWishlist(product._id);
-
-
-                setLiked(false);
-
-
-            } 
-            else {
-
-
-                await addWishlist(product._id);
-
-
-                setLiked(true);
-
-
-            }
-
-
-        } 
-        catch (error) {
-
-
-            console.log(error);
-
-
-        }
-
-
-    };
-
-
-
-
-
-
-    return (
-
-
-        <div className="
+  return (
+    <div
+      className="
         bg-white
         rounded-2xl
         shadow-lg
@@ -104,103 +64,60 @@ function ProductCard({ product }) {
         hover:-translate-y-1
         transition
         duration-300
-        ">
-
-
-
-
-
-            <Link to={`/product/${product._id}`}>
-
-
-
-                {
-                    product.image &&
-
-
-                    <img
-
-                    src={`https://mern-ecommerce-rhhf.onrender.com${product.image}`}
-
-                    alt={product.name}
-
-                    className="
+        "
+    >
+      <Link to={`/product/${product._id}`}>
+        {product.image && (
+          <img
+            src={
+              product.image.startsWith("http")
+                ? product.image
+                : `https://mern-ecommerce-rhhf.onrender.com${product.image}`
+            }
+            alt={product.name}
+            className="
                     w-full
                     h-52
                     object-cover
                     rounded-xl
                     "
+          />
+        )}
 
-                    />
-
-
-                }
-
-
-
-
-
-                <h3 className="
+        <h3
+          className="
                 text-xl
                 font-bold
                 mt-4
                 text-gray-800
-                ">
+                "
+        >
+          {product.name}
+        </h3>
+      </Link>
 
-                {product.name}
-
-                </h3>
-
-
-
-            </Link>
-
-
-
-
-
-
-            <p className="
+      <p
+        className="
             text-blue-600
             font-bold
             text-lg
             mt-2
-            ">
+            "
+      >
+        ₹ {product.price}
+      </p>
 
-            ₹ {product.price}
-
-            </p>
-
-
-
-
-
-
-
-
-
-            <div className="
+      <div
+        className="
             flex
             gap-3
             mt-5
             items-center
-            ">
-
-
-
-
-
-
-            {
-
-            cartProduct
-
-            ?
-
-            (
-
-
-            <div className="
+            "
+      >
+        {cartProduct ? (
+          <div
+            className="
             flex
             items-center
             justify-between
@@ -209,17 +126,11 @@ function ProductCard({ product }) {
             rounded-xl
             px-3
             py-2
-            ">
-
-
-
-                <button
-
-                onClick={()=>
-                    decreaseQuantity(product._id)
-                }
-
-                className="
+            "
+          >
+            <button
+              onClick={() => decreaseQuantity(product._id)}
+              className="
                 w-10
                 h-10
                 rounded-full
@@ -232,41 +143,23 @@ function ProductCard({ product }) {
                 hover:text-white
                 transition
                 "
+            >
+              -
+            </button>
 
-                >
-
-                -
-
-                </button>
-
-
-
-
-
-
-                <span className="
+            <span
+              className="
                 text-xl
                 font-bold
                 text-gray-800
-                ">
+                "
+            >
+              {cartProduct.quantity}
+            </span>
 
-                {cartProduct.quantity}
-
-                </span>
-
-
-
-
-
-
-
-                <button
-
-                onClick={()=>
-                    increaseQuantity(product._id)
-                }
-
-                className="
+            <button
+              onClick={() => increaseQuantity(product._id)}
+              className="
                 w-10
                 h-10
                 rounded-full
@@ -277,35 +170,13 @@ function ProductCard({ product }) {
                 hover:bg-blue-700
                 transition
                 "
-
-                >
-
-                +
-
-                </button>
-
-
-
-            </div>
-
-
-            )
-
-
-            :
-
-
-            (
-
-
-            <button
-
-
-            onClick={()=>
-                addToCart(product)
-            }
-
-
+            >
+              +
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={handleAddToCart}
             className="
             flex-1
             bg-blue-600
@@ -320,41 +191,17 @@ function ProductCard({ product }) {
             hover:bg-blue-700
             transition
             "
-
-            >
-
-            <FaShoppingCart/>
-
-
+          >
+            <FaShoppingCart />
             Add To Cart
+          </button>
+        )}
 
+        {/* Wishlist */}
 
-            </button>
-
-
-            )
-
-            }
-
-
-
-
-
-
-
-
-
-            {/* Wishlist */}
-
-
-
-            <button
-
-
-            onClick={handleWishlist}
-
-
-            className={`
+        <button
+          onClick={handleWishlist}
+          className={`
 
             px-5
 
@@ -376,47 +223,18 @@ function ProductCard({ product }) {
 
 
             ${
-                liked
-
-                ?
-
-                "bg-red-500 border-red-500 text-white"
-
-                :
-
-                "bg-white border-gray-300 text-gray-400 hover:text-red-500"
-
+              liked
+                ? "bg-red-500 border-red-500 text-white"
+                : "bg-white border-gray-300 text-gray-400 hover:text-red-500"
             }
 
             `}
-
-
-            >
-
-
-            <FaHeart/>
-
-
-            </button>
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-        </div>
-
-
-    );
-
-
+        >
+          <FaHeart />
+        </button>
+      </div>
+    </div>
+  );
 }
-
 
 export default ProductCard;
